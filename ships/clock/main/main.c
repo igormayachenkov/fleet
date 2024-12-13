@@ -7,9 +7,13 @@
 
 
 static const char *TAG = "clock";
-static uint8_t ledState = 0;
-#define GPIO_OUTPUT  19
 
+// CHANNELS LIST
+static gpio_num_t channels[4] = {13,12,14,27};
+static uint8_t    channel = 0; // current channel
+
+#define CHANNEL_ON  0
+#define CHANNEL_OFF 1
 
 void app_main(void)
 {
@@ -25,7 +29,7 @@ void app_main(void)
     //set as output mode
     io_conf.mode = GPIO_MODE_OUTPUT;
     //bit mask of the pins that you want to set,e.g.GPIO18/19
-    io_conf.pin_bit_mask = 1ULL<<GPIO_OUTPUT ; //((1ULL<<GPIO_OUTPUT_IO_0) | (1ULL<<GPIO_OUTPUT_IO_1))
+    io_conf.pin_bit_mask = ((1ULL<<channels[0]) | (1ULL<<channels[1]) | (1ULL<<channels[2]) | (1ULL<<channels[3]));
     //disable pull-down mode
     io_conf.pull_down_en = 0;
     //disable pull-up mode
@@ -33,16 +37,24 @@ void app_main(void)
     //configure GPIO with the given settings
     gpio_config(&io_conf);
 
-    int error;
     while(1){
 
-        // LED
-        ledState = !ledState;
-        ESP_LOGI(TAG, "ledState: %s!", ledState == true ? "ON" : "OFF");
-        gpio_set_level(GPIO_OUTPUT, ledState);
+        // Hide old channel
+        gpio_set_level(channels[channel], CHANNEL_OFF);
+
+        // Select new channel
+        channel++;
+        if(channel==4) channel=0;
+
+        // Show new channel
+        gpio_set_level(channels[channel], CHANNEL_ON);
+
+
+
+        ESP_LOGI(TAG, "channel: %d", channel);
 
         
-        vTaskDelay( 3000 / portTICK_PERIOD_MS );
+        vTaskDelay( 1000 / portTICK_PERIOD_MS );
     }
 
 }
