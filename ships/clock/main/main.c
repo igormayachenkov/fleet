@@ -10,17 +10,14 @@ static const char *TAG = "clock";
 
 // CHANNELS LIST
 #define CHANNELS_N 4
-//static gpio_num_t channels[CHANNELS_N] = {13,12,14,27};
-// static gpio_num_t channels[CHANNELS_N] = {26,25,33,32}; works   
-static gpio_num_t channels[CHANNELS_N] = {18,19,21,3};// works
-//static gpio_num_t channels[CHANNELS_N] = {3,3,22,23};// works
+static gpio_num_t channels[CHANNELS_N] = {16,17,18,19};// works
 static uint8_t    channel = 0; // current channel
 #define CHANNEL_ON  0
 #define CHANNEL_OFF 1
 
 // SEGMENTS LIST
 #define SEGMENTS_N 7
-static gpio_num_t segments[SEGMENTS_N] = {36,36,36,36,36,36,36};
+static gpio_num_t segments[SEGMENTS_N] = {13,12,14,27,26,25,33};
 
 // SYMBOLS in 7_seg indicator
 //   a
@@ -44,7 +41,7 @@ static uint8_t symbols[SYMBOLS_N][SEGMENTS_N] = {
     };
 
 // VIDEO MEMORY (symbols for channels)
-static uint8_t videoMemory[CHANNELS_N] = {1,2,3,4};
+static uint8_t videoMemory[CHANNELS_N] = {8,8,8,8};
 
 void app_main(void)
 {
@@ -63,7 +60,7 @@ void app_main(void)
     //bit mask of the pins that you want to set,e.g.GPIO18/19
     io_conf.pin_bit_mask = 0;
     for( i=0; i<CHANNELS_N; i++ ) io_conf.pin_bit_mask |= (1ULL<<channels[i]);
-//    for( i=0; i<SEGMENTS_N; i++ ) io_conf.pin_bit_mask |= (1ULL<<segments[i]);
+    for( i=0; i<SEGMENTS_N; i++ ) io_conf.pin_bit_mask |= (1ULL<<segments[i]);
     //disable pull-down mode
     io_conf.pull_down_en = 0;
     //disable pull-up mode
@@ -81,9 +78,9 @@ void app_main(void)
         if(channel==CHANNELS_N) channel=0;
 
         // Update pins according to "video memory" (segments for the channel)
-        // uint8_t* symbol = symbols[videoMemory[channel]]; // Get current symbol for the channel
-        // for(i=0; i<SEGMENTS_N; i++)
-        //     gpio_set_level(segments[i], symbol[i]); // Set segment value
+        uint8_t* symbol = symbols[videoMemory[channel]]; // Get current symbol for the channel
+        for(i=0; i<SEGMENTS_N; i++)
+            gpio_set_level(segments[i], symbol[i]); // Set segment value
 
         // Show new channel
         gpio_set_level(channels[channel], CHANNEL_ON);
