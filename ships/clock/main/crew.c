@@ -7,6 +7,14 @@
 #include "esp_log.h"
 #include "rom/ets_sys.h"
 #include "crew.h"
+#include "esp_task_wdt.h"
+
+/**
+ * TASK WATCHDOG
+ * To disable it
+ * in "sdkconfig" file
+ *     CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n
+ **/
 
 static const char *TAG = "crew";
 
@@ -44,7 +52,7 @@ static uint8_t symbols[SYMBOLS_N][SEGMENTS_N] = {
     };
 
 // VIDEO MEMORY (symbols for channels)
-static uint8_t videoMemory[CHANNELS_N] = {8,8,8,8};
+static uint8_t videoMemory[CHANNELS_N] = {0,1,2,3};
 
 
 
@@ -71,10 +79,18 @@ void taskCrew( void *pvParameters )
     //configure GPIO with the given settings
     gpio_config(&io_conf);
 
+    // Hide channels before
+    for(i=0; i<CHANNELS_N; i++)
+        gpio_set_level(channels[i], CHANNEL_OFF);
+
+
     while(1){
 
         // Hide old channel
         gpio_set_level(channels[channel], CHANNEL_OFF);
+
+        ets_delay_us(500); 
+
 
         // Select new channel
         channel++;
@@ -90,10 +106,13 @@ void taskCrew( void *pvParameters )
 
 
 
-        ESP_LOGI(TAG, "channel: %d", channel);
+        //ESP_LOGI(TAG, "channel: %d", channel);
 
         
-        vTaskDelay( 1000 / portTICK_PERIOD_MS );
+        ets_delay_us(500); 
+        //vTaskDelay( 100 / portTICK_PERIOD_MS );
+
+        //esp_task_wdt_reset(); do not!
     }
 
     /* Tasks must not attempt to return from their implementing
