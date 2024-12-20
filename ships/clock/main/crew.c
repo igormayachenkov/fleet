@@ -53,9 +53,32 @@ static uint8_t symbols[SYMBOLS_N][SEGMENTS_N] = {
 
 // VIDEO MEMORY (symbols for channels)
 static uint8_t videoMemory[CHANNELS_N] = {0,1,2,3};
+#define MIN_L  0 
+#define MIN_H  1
+#define HOUR_L 2
+#define HOUR_H 3
+
+void updateTime(int h, int m){
+    int digit; 
+    ESP_LOGI(TAG, "updateTime(h,m): %i %i",h,m);
+
+    // Update video memory
+    digit = m/10; // min high
+    videoMemory[MIN_H] = digit;
+    digit = m-digit*10; // min low
+    videoMemory[MIN_L] = digit;
+    
+    digit = h/10; // hour high
+    videoMemory[HOUR_H] = digit;
+    digit = h-digit*10; // hour low
+    videoMemory[HOUR_L] = digit;
+    
+    ESP_LOGI(TAG, "    video memory :  %i %i %i %i", videoMemory[3], videoMemory[2], videoMemory[1], videoMemory[0]);
+}
 
 
-
+//-----------------------------------------------------------------------------------------------------
+// THE TASK
 void taskCrew( void *pvParameters )
 {
     uint8_t i;

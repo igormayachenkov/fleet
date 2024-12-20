@@ -7,6 +7,7 @@
 #include "esp_log.h"
 #include "rom/ets_sys.h"
 #include "crew.h"
+#include <time.h>
 
 
 static const char *TAG = "clock";
@@ -35,6 +36,19 @@ void app_main(void)
     while(1){
 
         ESP_LOGI(TAG, "The main loop...");
+
+
+        // TIME
+        time_t now; 
+        struct tm timeinfo;
+
+        time(&now); // get time in seconds
+        gmtime_r(&now, &timeinfo); // convert to structure
+
+        ESP_LOGI(TAG, "The current h m : %i %i %i", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+
+        updateTime(timeinfo.tm_min,  timeinfo.tm_sec);
+        //updateTime(timeinfo.tm_hour, timeinfo.tm_min);
 
         
         vTaskDelay( 8000 / portTICK_PERIOD_MS );
