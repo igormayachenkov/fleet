@@ -7,31 +7,45 @@
 #include "esp_log.h"
 #include "rom/ets_sys.h"
 #include "crew.h"
+#include "radio.h"
 #include <time.h>
 
 
-static const char *TAG = "clock";
+static const char *TAG = "captain";
 
 void app_main(void)
 {
     ESP_LOGW(TAG, "***** APP started, core ID: %i   portTICK_PERIOD_MS: %lu *****", xPortGetCoreID(), portTICK_PERIOD_MS);
 
     BaseType_t xReturned; // Used to pass out the created task's handle. 
-    TaskHandle_t xHandle = NULL;
+    TaskHandle_t xHandleCrew  = NULL;
+    TaskHandle_t xHandleRadio = NULL;
 
-    /* Create the task, storing the handle. */
+    /* Create Crew task, storing the handle. */
     xReturned = xTaskCreatePinnedToCore(
         taskCrew,       /* Function that implements the task. */
         "Crew",          /* Text name for the task. */
         4096,      /* Stack size in words, not bytes. */
         ( void * ) 1,    /* Parameter passed into the task. */
         tskIDLE_PRIORITY+10,/* Priority at which the task is created. */
-        &xHandle,
+        &xHandleCrew,
         1 //core ID
     );      
     if( xReturned == pdPASS )  ESP_LOGI(TAG, "Task Crew created, prio: %i",tskIDLE_PRIORITY);
     else                       ESP_LOGE(TAG, "Task Crew NOT created");
     
+    /* Create Radio task, storing the handle. */
+    xReturned = xTaskCreatePinnedToCore(
+        taskRadio,       /* Function that implements the task. */
+        "Radio",          /* Text name for the task. */
+        4096,      /* Stack size in words, not bytes. */
+        ( void * ) 1,    /* Parameter passed into the task. */
+        tskIDLE_PRIORITY+10,/* Priority at which the task is created. */
+        &xHandleRadio,
+        0 //core ID
+    );      
+    if( xReturned == pdPASS )  ESP_LOGI(TAG, "Task Radio created, prio: %i",tskIDLE_PRIORITY);
+    else                       ESP_LOGE(TAG, "Task Radio NOT created");
 
     while(1){
 
