@@ -8,7 +8,7 @@
 #include "rom/ets_sys.h"
 #include "radio.h"
 #include "esp_task_wdt.h"
-
+#include "radio_data.h"
 
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -55,10 +55,7 @@ static int s_retry_num = 0;
 
 #define EXAMPLE_H2E_IDENTIFIER ""
 
-static void send_data(){
-    ESP_LOGW(TAG, "send data");
-    vTaskDelay( 1000 / portTICK_PERIOD_MS );
-}
+
 
 static void event_handler(
     void* arg, 
@@ -87,7 +84,7 @@ static void event_handler(
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
 
-        send_data();
+        send_receive_data();
 
         ESP_LOGW(TAG, "disconnect");
         esp_wifi_disconnect();
