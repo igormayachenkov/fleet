@@ -164,7 +164,7 @@ void taskRadio( void *pvParameters )
         ESP_LOGW(TAG, "connect");
         esp_wifi_connect();
         
-        vTaskDelay( 10000 / portTICK_PERIOD_MS );
+        vTaskDelay( 30000 / portTICK_PERIOD_MS );
     }
      vTaskDelete( NULL );
 
