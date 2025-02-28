@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.igormayachenkov.flagman.radio.Message
 import ru.igormayachenkov.flagman.radio.RadioMan
 
 object Captain {
@@ -26,14 +28,28 @@ object Captain {
     fun start(context: Context) {
         Log.d(TAG,"start")
 
+
         scope.launch {
-            radioMan.received.collect { msg ->
-                Log.d(TAG,"received message: $msg")
-                _state.emit(
-                    State(_state.value.receiveMessagesCount+1)
-                )
+            radioMan.run()
+        }
+    }
+
+    fun sendMessage(){
+        val msg = Message(time=System.currentTimeMillis(), data= ByteArray(0))
+        scope.launch {
+            radioMan.toSend.send(msg)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun readReceivedMessages(){
+        scope.launch {
+            radioMan.received.apply {
+                while(!isEmpty) {
+                    val msg = receive()
+                    _state.emit(State(state.value.receiveMessagesCount+1))
+                }
             }
-            Log.d(TAG,"finished")
         }
     }
 }

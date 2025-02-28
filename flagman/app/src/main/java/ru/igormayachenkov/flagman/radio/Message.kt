@@ -1,5 +1,7 @@
 package ru.igormayachenkov.flagman.radio
 
+import java.util.Date
+
 data class Message(
     val time : Long,
     val data : ByteArray
@@ -20,5 +22,10 @@ data class Message(
         var result = time.hashCode()
         result = 31 * result + data.contentHashCode()
         return result
+    }
+
+    override fun toString(): String {
+        val date = Date(time)
+        return date.toString()
     }
 }

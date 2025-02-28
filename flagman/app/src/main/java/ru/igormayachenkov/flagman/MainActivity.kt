@@ -6,9 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +35,23 @@ class MainActivity : ComponentActivity() {
                     ){
                         val state by Captain.state.collectAsState()
                         Column(Modifier.fillMaxWidth()) {
+                            Text("Captain interface")
+                            Spacer(Modifier.height(30.dp))
+
+                            // Send button
+                            Button({Captain.sendMessage()}) {
+                                Text("Send a message")
+                            }
+                            Spacer(Modifier.height(30.dp))
+
+                            // Send button
+                            Button({Captain.readReceivedMessages()}) {
+                                Text("Read received")
+                            }
+                            Spacer(Modifier.height(30.dp))
+
+
+                            // Message list
                             Row(
                                 Modifier
                                     .fillMaxWidth()
@@ -39,6 +59,7 @@ class MainActivity : ComponentActivity() {
                                 Text("Number of received messages:", Modifier.weight(1f))
                                 Text("${state.receiveMessagesCount}")
                             }
+
                         }
                     }
                 }
